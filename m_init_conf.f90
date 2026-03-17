@@ -8,11 +8,11 @@ contains
     subroutine init_conf(coord, filename)
 
         real(8), intent(out) :: coord(3, n_atoms)
-        character(len=100), intent(in) :: filename
+        character(len=*), intent(in) :: filename
         integer :: i, rot_factor
 
-        real(8) :: sa, ca, sp, cp
-        real(8) :: angle_rad, phi_rad
+        real(8) :: sa, ca
+        real(8) :: angle_rad
 
         real(8) :: ux, uy
 

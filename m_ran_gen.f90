@@ -1,5 +1,5 @@
 !module to generate random numbers with fsgl
-module ran_gen
+module m_ran_gen
     use fgsl
     implicit none
 
@@ -11,7 +11,7 @@ contains
     !Subroutine to initialize the random number generator with a given seed
     subroutine init_rng(seed_value)
         implicit none
-        integer, intent(in) :: seed_value
+        integer(8), intent(in) :: seed_value
         type(fgsl_rng_type) :: type
 
         ! Initialize the random number generator
@@ -36,3 +36,5 @@ contains
         call fgsl_rng_free(gen)
         print *, "RNG closed"
     end subroutine close_rng
+
+end module m_ran_gen
