@@ -2,4 +2,4 @@
 
 List of participants:
 
-- JAVIER JORGE FERNANDEZ
+- JAVIER JORGE FERNANDEZ (jjavifdez)
