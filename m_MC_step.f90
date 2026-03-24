@@ -45,7 +45,7 @@ module m_MC_step
                 new_coord = old_coord ! Revert to old coordinates if the new configuration is not accepted
             end if
         end if
-        print '(A15, F12.6, A15, F12.6)', 'Old Energy: ', old_energy, 'New Energy: ', new_energy
+
     end subroutine MC_step
 
 end module m_MC_step

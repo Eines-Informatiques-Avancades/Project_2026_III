@@ -59,11 +59,12 @@ module m_rot_dihedral
     !It makes a rotation of one atom perpendiculary arround the direction
     !defined by two reference atoms from a given dihedral angle
 
-    subroutine ang_rot(pref_1, pref_2, prot, phi_CC_mod)
-        real(8), intent(in) :: pref_1(3), pref_2(3), phi_CC_mod
+    subroutine ang_rot(pref_1, pref_2, prot, angle)
+        real(8), intent(in) :: pref_1(3), pref_2(3), angle
         real(8), intent(inout) :: prot(3)
         real(8) :: u(3), v(3), w(3), norm_v(3), norm_w(3), x_vec(3), y_vec(3), proy_uv(3)
-        real(8) :: rad, v_mod, w_mod, p_prim(3)
+        real(8) :: rad, v_mod, w_mod, p_prim(3),angle_rad
+        real(8), parameter :: PI = 3.141592653589793d0
 
         u = prot - pref_1
         v = pref_2 - pref_1
@@ -86,20 +87,21 @@ module m_rot_dihedral
 
         !Rotation in 2D
         rad = w_mod
+        angle_rad = angle * PI / 180.0d0
         if (w_mod < 1.0d-10) return ! No hay nada que rotar, el átomo está en el eje
-        prot = p_prim + rad *cos(phi_CC_mod) * x_vec + rad * sin(phi_CC_mod) * y_vec
+        prot = p_prim + rad *cos(angle_rad) * x_vec + rad * sin(angle_rad) * y_vec
 
     end subroutine ang_rot
 
-    subroutine dihedral_rotation(i, coords, phi_CC_mod, n_atoms)
+    subroutine dihedral_rotation(i, coords, angle, n_atoms)
         integer, intent(in) :: i, n_atoms
         real(8), intent(inout) :: coords(3, n_atoms)
-        real(8), intent(in) :: phi_CC_mod
+        real(8), intent(in) :: angle
         integer :: j
 
         do j = i + 1, n_atoms
 
-            call ang_rot(coords(:, i-1), coords(:, i), coords(:, j), phi_CC_mod)
+            call ang_rot(coords(:, i-1), coords(:, i), coords(:, j), angle)
         end do
 
     end subroutine dihedral_rotation

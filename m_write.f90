@@ -11,7 +11,7 @@ module m_write
          write(unit,*) n_atoms
          write(unit,*) '#step ', step
          do i = 1, n_atoms
-             write(unit, '(3F12.6)') coord(1, i), coord(2, i), coord(3, i)
+             write(unit, '(A1,3F12.6)') 'C', coord(1, i), coord(2, i), coord(3, i)
          end do
      end subroutine write_coord
  

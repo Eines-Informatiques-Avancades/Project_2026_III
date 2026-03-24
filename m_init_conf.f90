@@ -14,7 +14,7 @@ contains
         real(8) :: sa, ca
         real(8) :: angle_rad
 
-        real(8) :: ux, uy
+        real(8) :: ux, uy, ux_rot, uy_rot
 
 
         !Convert angles to radians 
@@ -52,12 +52,12 @@ contains
             uy = coord(2, i-2) - coord(2, i-1)
 
             !Rotating vector 
-            ux = ux * ca + uy * sa * rot_factor
-            uy = -ux * sa * rot_factor + uy * ca
+            ux_rot = ux * ca + uy * sa * rot_factor
+            uy_rot = -ux * sa * rot_factor + uy * ca
 
             !Adding vector to last atom to calculate new position
-            coord(1, i) = coord(1, i-1) + ux
-            coord(2, i) = coord(2, i-1) + uy
+            coord(1, i) = coord(1, i-1) + ux_rot
+            coord(2, i) = coord(2, i-1) + uy_rot
             coord(3, i) = coord(3, i-1)
             write(1, *) 'C', coord(1, i), coord(2, i), coord(3, i)
 
