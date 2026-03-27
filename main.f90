@@ -6,7 +6,7 @@ program main
     implicit none
 
     integer :: accepted_moves, rejected_moves, i
-    real(8) :: old_coord(3, 500), new_coord(3, 500)
+    real(8) :: old_coord(3, 500), new_coord(3, 500), phi_rot
     integer(8) :: seed
     seed = 123456789 
 
@@ -24,7 +24,12 @@ program main
 
 
     do i = 1, n_steps
-        call MC_step(old_coord, n_atoms, phi_CC_mod, new_coord, temp, accepted_moves, rejected_moves)
+        if (mod(i, 2) == 0) then
+            phi_rot = phi_CC_mod
+        else
+            phi_rot = -phi_CC_mod
+        end if
+        call MC_step(old_coord, n_atoms, phi_rot, new_coord, temp, accepted_moves, rejected_moves)
         if (mod(i, 100) == 0) then
             call write_coord(2, new_coord, step = i)
         end if
