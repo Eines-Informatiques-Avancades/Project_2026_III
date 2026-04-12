@@ -11,20 +11,28 @@ DBFLAGS = -g -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
 # FLAGS DE OPTIMIZACIÓN (PRODUCCIÓN)
 PRODFLAGS = -O2
 
+# FLAGS DE PROFILING
+PROFFLAGS = -pg
+
 # Por defecto usamos producción, a menos que se diga lo contrario
-FFLAGS = $(PRODFLAGS) -Wall -I/usr/local/include/fgsl
+FFLAGS = $(PRODFLAGS) -Wall `pkg-config --cflags fgsl`
 LDFLAGS = `pkg-config --libs fgsl`
 
-# --- Si escribes 'make DEBUG=1', se usarán los flags de depuración ---
+# 'make DEBUG=1' para compilar con depuración
 ifeq ($(DEBUG), 1)
-    FFLAGS = $(DBFLAGS) -Wall -I/usr/local/include/fgsl
+    FFLAGS = $(DBFLAGS) -Wall `pkg-config --cflags fgsl`
 endif
 
-# ... (resto del Makefile igual: TARGET, OBJ, reglas de dependencia) ...
+# 'make PROF=1' para compilar con profiling
+ifeq ($(PROF), 1)
+	FFLAGS += $(PROFFLAGS)
+	LDFLAGS += $(PROFFLAGS)
+endif
+#Reglas de compilación
 
 TARGET = programa_mc.exe
 OBJ = m_constants.o m_init_conf.o m_rot_dihedral.o m_energy.o \
-      m_write.o m_ran_gen.o m_MC_step.o main.o
+      m_write.o m_ran_gen.o m_MC_step.o m_tower.o main.o
 
 all: $(TARGET)
 
@@ -36,11 +44,11 @@ $(TARGET): $(OBJ)
 
 m_init_conf.o: m_init_conf.f90 m_constants.o
 m_rot_dihedral.o: m_rot_dihedral.f90 m_constants.o
-m_energy.o: m_energy.f90 m_constants.o
+m_energy.o: m_energy.f90 m_constants.o m_rot_dihedral.o
 m_write.o: m_write.f90 m_constants.o
+m_tower.o: m_tower.f90 m_constants.o m_ran_gen.o
 m_ran_gen.o: m_ran_gen.f90
-	$(FC) $(FFLAGS) `pkg-config --cflags fgsl` -c m_ran_gen.f90
-m_MC_step.o: m_MC_step.f90 m_constants.o m_energy.o m_rot_dihedral.o m_ran_gen.o
+m_MC_step.o: m_MC_step.f90 m_constants.o m_energy.o m_rot_dihedral.o m_ran_gen.o m_tower.o
 main.o: main.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o
 
 clean:

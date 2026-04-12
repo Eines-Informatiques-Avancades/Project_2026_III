@@ -5,41 +5,58 @@ program main
     use m_write
     implicit none
 
-    integer :: accepted_moves, rejected_moves, i
-    real(8) :: old_coord(3, 500), new_coord(3, 500), phi_rot
+    integer :: accepted_moves, accepted_moves_b, rejected_moves, j, step
+    real(8) :: coord(3, n_atoms), phi_rot
+    real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
+    real(8) :: tower(n_atoms-3)
     integer(8) :: seed
     seed = 123456789 
 
     ! Initialize parameters
     accepted_moves = 0
+    accepted_moves_b = 0
     rejected_moves = 0
 
-    ! Initialize old coordinates (for example, a linear chain)
-    call init_conf(old_coord, 'initial_config.xyz')
+    ! Initialize coordinates (linear zig-zag configuration)
+    call init_conf(coord, 'initial_config.xyz')
 
     open(2, file='trayectory.xyz', status='replace')
-    call write_coord(2, old_coord, step = 0)
+    open(3, file='energy_log.txt', status='replace')
+    open(4, file='dihedral_angles.txt', status='replace')
+    call write_coord(2, coord, step = 0)
 
     call init_rng(seed) ! Initialize random number generator with a fixed seed for reproducibility
 
+    tower = tower_gen(n_atoms-3, k_factor) ! Generate the tower for selecting dihedral angles
 
-    do i = 1, n_steps
-        if (mod(i, 2) == 0) then
-            phi_rot = phi_CC_mod
-        else
-            phi_rot = -phi_CC_mod
+
+    !Calculate initial energy and dihedral angles
+
+    call calc_energy(coord, dihedral_lst, E_LJ, E_dih)
+
+    do step = 1, n_steps
+        phi_rot = (get_random() - 0.5d0) * 2.0d0 * phi_CC_mod  ! Random rotation angle between phi_CC_mod and -phi_CC_mod
+        call MC_step(coord, phi_rot, tower, &
+         accepted_moves, rejected_moves, energy, dihedral_lst, &
+         E_LJ, E_dih)
+        if (mod(step, 100) == 0) then
+            call write_coord(2, coord, step = step)
+            write(3, *) energy, E_LJ, E_dih
+            if (step > n_steps/2) then
+                do j = 1, n_atoms-3
+                    write(4, *) dihedral_lst(j)
+                end do
+            end if
         end if
-        call MC_step(old_coord, n_atoms, phi_rot, new_coord, temp, accepted_moves, rejected_moves)
-        if (mod(i, 100) == 0) then
-            call write_coord(2, new_coord, step = i)
+        if(mod(step, n_steps/100) == 0) then
+            print *, step/(n_steps/100), '% completed', 'Accepted:', accepted_moves &
+            , 'Rejected : ', rejected_moves
         end if
-        if(mod(i, n_steps/100) == 0) then
-            print *, i/(n_steps/100), '% completed', 'Accepted moves: ', accepted_moves, 'Rejected moves: ', rejected_moves
-        end if
-        old_coord = new_coord
     end do
 
     close(2)
+    close(3)
+    close(4)
     call close_rng() ! Close the random number generator
 end program main
    

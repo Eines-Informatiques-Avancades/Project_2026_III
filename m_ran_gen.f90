@@ -37,4 +37,5 @@ contains
         print *, "RNG closed"
     end subroutine close_rng
 
+
 end module m_ran_gen

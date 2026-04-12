@@ -106,6 +106,18 @@ module m_rot_dihedral
 
     end subroutine dihedral_rotation
 
+
+    function phi_lst(coord) result(lst)
+        real(8), intent(in) :: coord(3, n_atoms)
+        real(8) :: lst(n_atoms-3)
+        integer :: i
+
+        do i = 3, n_atoms-1
+            lst(i-2) = calc_dihedral(coord, i)
+        end do
+
+    end function phi_lst
+
 end module m_rot_dihedral
 
 
