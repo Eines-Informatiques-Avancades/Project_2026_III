@@ -4,7 +4,8 @@ module m_init_conf
 contains
 
 
-
+    !It initializes the configuration of the carbon chain and writes it to a file
+    !It generates a zig-zag configuration in a 2D plane with the specified bond length and angle
     subroutine init_conf(coord, filename)
 
         real(8), intent(out) :: coord(3, n_atoms)

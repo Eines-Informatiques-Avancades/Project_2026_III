@@ -4,6 +4,8 @@ module m_rot_dihedral
 
     contains
 
+    !It calculates the dihedral angle in which the atom i is the third atom of the dihedral
+    !defined by atoms i-2, i-1, i and i+1
     function calc_dihedral(coord, i) result(phi)
         real(8), intent(in) :: coord(3, n_atoms)
         integer, intent(in) :: i
@@ -31,6 +33,7 @@ module m_rot_dihedral
 
     end function calc_dihedral
 
+    !It calculates the cross product of two 3D vectors
     function cross_product(a, b) result(c)
         real(8), intent(in) :: a(3), b(3)
         real(8) :: c(3)
@@ -41,6 +44,7 @@ module m_rot_dihedral
 
     end function cross_product
 
+    !It normalizes a 3D vector
     function normalize(v) result(v_norm)
         real(8), intent(in) :: v(3)
         real(8) :: v_norm(3)
@@ -58,7 +62,6 @@ module m_rot_dihedral
 
     !It makes a rotation of one atom perpendiculary arround the direction
     !defined by two reference atoms from a given dihedral angle
-
     subroutine ang_rot(pref_1, pref_2, prot, angle)
         real(8), intent(in) :: pref_1(3), pref_2(3), angle
         real(8), intent(inout) :: prot(3)
@@ -93,6 +96,7 @@ module m_rot_dihedral
 
     end subroutine ang_rot
 
+    !It performs a dihedral rotation on the atom i and all the atoms connected to it (i+1, i+2, ...)
     subroutine dihedral_rotation(i, coords, angle, n_atoms)
         integer, intent(in) :: i, n_atoms
         real(8), intent(inout) :: coords(3, n_atoms)
@@ -106,7 +110,7 @@ module m_rot_dihedral
 
     end subroutine dihedral_rotation
 
-
+    !It calculates the list of dihedral angles for a given configuration
     function phi_lst(coord) result(lst)
         real(8), intent(in) :: coord(3, n_atoms)
         real(8) :: lst(n_atoms-3)

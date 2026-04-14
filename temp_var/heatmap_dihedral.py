@@ -24,7 +24,7 @@ bins_angle = np.linspace(-180, 180, 181)
 heatmap_matrix = []
 
 for t in sorted_temps:
-    hist, _ = np.histogram(data_dict[t], bins=bins_angle, density = true)
+    hist, _ = np.histogram(data_dict[t], bins=bins_angle, density = True)
     heatmap_matrix.append(hist)
 
 #Trasnpose the matrix to have temperatures in rows and angles in columns
@@ -41,9 +41,9 @@ sns.heatmap(heatmap_matrix,
 #Adjusting Y axis to show angles from -180 to 180
 plt.yticks(np.arange(0, 181, 10), np.int32(bins_angle[::10]))
 
-plt.title('Distribución de Ángulos Diedros vs Temperatura', fontsize=15)
-plt.xlabel('Temperatura (K)', fontsize=12)
-plt.ylabel('Ángulo Diedro (grados)', fontsize=12)
-plt.gca().invert_yaxis() # Opcional: para que -180 esté abajo y 180 arriba
+plt.title('Temperature vs Dihedral Angles', fontsize=15)
+plt.xlabel('Temperature (K)', fontsize=12)
+plt.ylabel('Dihedral Angle (degrees)', fontsize=12)
+plt.gca().invert_yaxis() 
 plt.tight_layout()
-plt.show()
+plt.savefig('3_Heatmap_Dihedral_Angles_vs_Temperature.png')

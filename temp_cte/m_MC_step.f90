@@ -7,6 +7,7 @@ module m_MC_step
     implicit none
     contains
 
+    !It performs one MC step
     subroutine MC_step(coord, phi_rot, tower, &
          accepted_moves, rejected_moves, energy, dihedral_lst, &
          E_LJ, E_dih)
@@ -17,22 +18,25 @@ module m_MC_step
         integer, intent(inout):: accepted_moves, rejected_moves
         integer :: rand_atom
 
-
-        rand_atom = tower_sample(tower) ! Select an atom based on the tower
+        ! Select an atom based on the tower
+        rand_atom = tower_sample(tower) 
         
-        rand_num = get_random()
-        rand_atom = int(3.0d0 + ((n_atoms - 1.0d0) - 3.0d0)* rand_num) ! Randomly select an atom between 3 and n_atoms-1
+        ! Store the old coordinates before rotation
+        old_coord = coord 
         
-        old_coord = coord ! Store the old coordinates before rotation
-        
+        ! Perform the dihedral rotation of the selected atom
         call dihedral_rotation(rand_atom, coord, phi_rot, n_atoms) ! Rotate the dihedral angle of the selected atom   
        
+        ! Calculate the dihedral angles list for the new configuration
+        new_phi_lst = phi_lst(coord)
 
-        new_phi_lst = phi_lst(coord) ! Calculate the dihedral angles list for the new configuration
-        call calc_energy(coord, new_phi_lst, E_LJ_new, E_dih_new) ! Calculate the energy of the new configuration
+        !Calculate the energy of the new configuration
+        call calc_energy(coord, new_phi_lst, E_LJ_new, E_dih_new) 
 
-        new_energy = E_LJ_new + E_dih_new ! Total energy of the new configuration
+        !Total energy of the new configuration
+        new_energy = E_LJ_new + E_dih_new 
 
+        !Acept if new energy is lower
         if (new_energy < energy) then
             accepted_moves = accepted_moves + 1
             energy = new_energy

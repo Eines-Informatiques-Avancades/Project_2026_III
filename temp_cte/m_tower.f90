@@ -4,6 +4,8 @@ module m_tower
     implicit none
     contains
 
+    !It generates a tower of cumulative probabilities for selecting an atom
+    !The probability of selecting an atom is proportional to its index raised to the power of k
     function tower_gen(n, k ) result(tower)
         integer, intent(in) :: n, k
         real(8) :: tower(n), tot_weight, weight(n)
@@ -20,10 +22,9 @@ module m_tower
             tower(i) =sum(weight(1:i)) / tot_weight
         end do
 
-        print *, 'Tower', tower
-
     end function tower_gen
 
+    !It samples an atom index from the tower of cumulative probabilities
     function tower_sample(tower) result(sample)
         real(8), intent(in) :: tower(:)
         integer :: sample, inf, sup, center

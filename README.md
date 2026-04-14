@@ -6,6 +6,20 @@ List of participants:
 
 -Reference to energy calculation of dihedral angule in poliethylene: https://www-sciencedirect-com.sire.ub.edu/science/article/pii/S2213138822001485
 
+Prerrequisitos: tener numpy, matplotlib.pyplot, seaborn fgsl, compilador gnu de fortran y gnuplot
+
+
+Contenido:
+###temp_cte###: se encuentra el programa de ejecución de simulaciones de montecarlo a Temperatura constante durante la simulacion
+###temp_var###: se encuentra el programa de ejecución de simulaciones de montecarlo a Temperatura variable durante la simulacion
+
+Ejecución:
+Dentro de cada carpeta ejecuta los siguientes comandos de Make en el siguiente orden.
+
+'Make run_all'--> Para ejecutar todas las simulaciones a las 6 temperaturas distintas. Creará 6 directorios con los datos de la simulacion
+
+'Make 
+
 
 -En cada bucle de MC se realizan varios giros de ángulo dihedro. De momento son natoms-3 giros. La idea es intentar optimizar para que al principio se permitan muchos giros, y poco a poco reducir tanto el numero de giros como el ángulo de giro gradualmente.
 

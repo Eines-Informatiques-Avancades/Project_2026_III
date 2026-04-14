@@ -12,7 +12,21 @@ program main
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
     real(8) :: tower(n_atoms-3), temp
     integer(8) :: seed
+    integer :: status
+    character(len=20) :: arg
+    
+    !Initial seed
     seed = 123456789 
+
+    !Read initial temperature from command line argument
+    call get_command_argument(1, arg, status=status)
+
+    if (status == 0) then
+        read(arg, *) i_temp
+    else
+        print *, "No temperature provided. Using default T=1000 K."
+        i_temp = 1000.0d0
+    end if
 
     ! Initialize parameters
     accepted_moves = 0
@@ -53,7 +67,6 @@ program main
         !Temperature modification starting at 10% of the total steps and every n_steps/T_blocks steps
         if (step > n_steps/10 .and. mod(step- (n_steps/10), n_steps/T_blocks) == 0 .and. step < n_steps/2) then
             temp = temp * alpha
-                print *, 'Temperature modified: ', temp
         end if
         
         ! Perform a Monte Carlo step
@@ -61,16 +74,16 @@ program main
          accepted_moves, rejected_moves, energy, dihedral_lst, &
          E_LJ, E_dih, temp)
 
-        !Writing results to files every 100 steps
-        if (mod(step, 100) == 0) then
+        !Writing results to files every 10 steps
+        if (mod(step, 10) == 0) then
             call write_coord(2, coord, step = step)
             write(3, *) energy, E_LJ, E_dih, temp
 
             !We write angles and distances when equilibration is reached
             if (step > n_steps/2) then
+                 write(5, *) end_end_dist(coord), rad_gyr(coord)
                 do j = 1, n_atoms-3
                     write(4, *) dihedral_lst(j)
-                    write(5, *) end_end_dist(coord), rad_gyr(coord)
                 end do
             end if
         end if
@@ -87,5 +100,7 @@ program main
     close(4)
     close(5)
     call close_rng() ! Close the random number generator
+
+    print *, 'Simulation completed. Total accepted moves: ', accepted_moves, 'Total rejected moves: ', rejected_moves
 end program main
    

@@ -4,6 +4,7 @@ module m_energy
     implicit none
 contains
 
+    !It calculates the dihedral energy for a given dihedral angle
     function dih_energy(phi) result(E)
         implicit none
         real(8), intent(in)  :: phi    ! Dihedral angle in degrees
@@ -26,10 +27,9 @@ contains
 
         E = E * 4.184d0
 
-        
-
     end function dih_energy
 
+    !It calculates the Lennard-Jones energy for a given set of coordinates
     function LJ_energy(coord) result(E)
         implicit none
         real(8), intent(in) :: coord(3, n_atoms)
@@ -65,6 +65,7 @@ contains
         end do
     end function LJ_energy
 
+    !It calculates the total energy of the system (LJ + dihedral) for a given set of coordinates and dihedral angles
     subroutine calc_energy(coord, dih_lst, E_LJ, E_dih)
         implicit none
         real(8), intent(in) :: coord(3, n_atoms), dih_lst(n_atoms-3)

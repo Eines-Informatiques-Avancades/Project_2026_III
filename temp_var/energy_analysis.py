@@ -27,4 +27,4 @@ for t in temps:
 plt.errorbar(temps, energy_means, yerr=energy_fluctuations, fmt='o-', capsize=5)
 plt.xlabel('Temperature (K)')
 plt.ylabel('Mean Total Energy in Equilibrium (kJ/mol)')
-plt.savefig('Total_Energy_vs_Temperature.png')
+plt.savefig('1_Total_Energy_vs_Temperature.png')

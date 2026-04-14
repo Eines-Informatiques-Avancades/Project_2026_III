@@ -2,7 +2,7 @@ module m_write
     use m_constants, only: n_atoms
     implicit none
  contains
- 
+    !It writes the coordinates of the atoms to a file in XYZ format
      subroutine write_coord(unit, coord, step)
          integer, intent(in) :: unit
          real(8), intent(in) :: coord(3, n_atoms)
