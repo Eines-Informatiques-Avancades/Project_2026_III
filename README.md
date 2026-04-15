@@ -1,32 +1,67 @@
+
 # Project_2026_III
 
-List of participants:
+## Participants
+* **Javier Jorge Fernández**
 
-- JAVIER JORGE FERNANDEZ (jjavifdez)
+## Brief Methodology
+This program implements a **Monte Carlo simulation** designed to model a simplified polyethylene chain consisting of **500 monomers**. The methodology is based on the following key considerations:
 
--Reference to energy calculation of dihedral angule in poliethylene: https://www-sciencedirect-com.sire.ub.edu/science/article/pii/S2213138822001485
+* **United Atom Model:** Each methyl and methylene unit ($-CH_2$ and $-CH_3$) is treated as a single interaction sphere. This reduces the computational cost by decreasing the number of force centers while maintaining physical accuracy.
+* **Lennard-Jones (LJ) Potential:** Non-bonded interactions are calculated using the $\sigma$ and $\epsilon$ parameters extracted directly from the referenced scientific article.
+* **Versatility and Customization:** The code is highly adaptable. Global constants can be modified to simulate other types of polymers by adjusting the LJ parameters. Additionally, the working temperature and the total number of simulation steps can be configured to study various thermodynamic regimes.
 
-Prerrequisitos: tener numpy, matplotlib.pyplot, seaborn fgsl, compilador gnu de fortran y gnuplot
+## Scientific Reference
+Dihedral energy function $E(\phi)$ in polyethylene chains and LJ parameters extracted from this article
+[Read article here](https://www-sciencedirect-com.sire.ub.edu/science/article/pii/S2213138822001485)
 
+## Prerequisites
+You must have the following tools installed:
+* `fgsl`: Fortran interface for GSL.
+* `gfortran`: GNU Compiler.
+* `gnuplot`: Visualization tool.
 
-Contenido:
-###temp_cte###: se encuentra el programa de ejecución de simulaciones de montecarlo a Temperatura constante durante la simulacion
-###temp_var###: se encuentra el programa de ejecución de simulaciones de montecarlo a Temperatura variable durante la simulacion
+## Project Structure
+| Directory | Description |
+| :--- | :--- |
+| `temp_cte` | Monte Carlo simulations at constant temperature ($T = \text{const}$). |
+| `temp_var` | Monte Carlo Simulations with variable initial temperatures ($T_0$). |
 
-Ejecución:
-Dentro de cada carpeta ejecuta los siguientes comandos de Make en el siguiente orden.
+### Directory Contents
+Each folder contains a self-contained environment with:
+* **Automation**: A `Makefile` to manage compilation and execution.
+* **Fortran Source**: 1 main program and 9 specialized modules (`.f90`).
+* **Analysis Scripts**: 
+  * 3 **Gnuplot** scripts for immediate visualization.
+  * 3 **Python** scripts for advanced data processing.
 
-'Make run_all'--> Para ejecutar todas las simulaciones a las 6 temperaturas distintas. Creará 6 directorios con los datos de la simulacion
+# Execution Guide
+Navigate to each directory (`temp_cte` or `temp_var`) and run the following `make` commands in order:
 
-'Make 
+### 1. Main Simulations
+* **`make run_all`**
+  Runs simulations for **6 different temperatures**. It creates 6 directories with 5 files of data:
+  * Distances.txt: it contains the squared radious of gyration and the squared end-to-end distance data during second half of simulation
+  * Dihedral_angles.txt: it contains a list of all dihedral angles during second half of the simulation
+  * Energy.txt: It contains total energy, LJ energy, dihedral energy and temperature (only in the simulation whixh temperature varies) of second half of the simulation
+  * Trayectory.xyz: contains the coordinates of the molecule during siumlation
+  * Log.txt: contains printed text during simulation
+   
+  and generates 3 summary files analyzing the evolution of:
+  * Mean squared radius of gyration ($R_g^2$) vs T.
+  * System energy vs T.
+  * Dihedral angle distribution relative to temperature vs T.
 
+* **`make all`**
+  If you want to execute a **single simulation** at a predefined temperature.
 
--En cada bucle de MC se realizan varios giros de ángulo dihedro. De momento son natoms-3 giros. La idea es intentar optimizar para que al principio se permitan muchos giros, y poco a poco reducir tanto el numero de giros como el ángulo de giro gradualmente.
+### 2. Visualization
+* **`make plot_local`**
+  Generates graphs from the `.txt` files located within each temperature directory.
 
--Lo que pasa al realizar muchos cambios aleatorios, es que la cadena puede chocar muy fácil, por lo que hay mucho rechazo.
-
--Ahora lo que vamos a hacer es intentar dar mas probabilidad a giros en posiciones terminales, para evitar que la molécula se quede atrapada en un mínimo dominado por el potencial de L-J, y que se exploren ángulos correspondientes a los dos mínimos de 60 y -60 del potencial del ángulo dihedro
-
--Observamos que este hecho no hace variar el diagrama de torsión. Un aumento de la temperatura de simulacion, forma un histograma con angulos dihedros que tienden a 0, pero no se nota una abundancia aparente en valores proximos a 0
-
-
+### 3. Cleanup
+* **`make clean`**
+  Removes all compiled files (`.mod`, `.o`), as well as the generated analysis directories and files.
+  
+* **`make clean_results`**
+  Removes **only** the generated analysis directories and output files, keeping the compiled binaries intact.
