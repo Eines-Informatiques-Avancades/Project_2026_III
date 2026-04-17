@@ -24,8 +24,8 @@ program main
     if (status == 0) then
         read(arg, *) temp
     else
-        print *, "No temperature provided. Using default T=1000 K."
-        temp = 1000.0d0
+        print *, "No temperature provided. Using default T=300 K."
+        temp = 300.0d0
     end if
 
     ! Initialize parameters

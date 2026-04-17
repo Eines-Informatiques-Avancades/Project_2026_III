@@ -10,10 +10,11 @@ program main
     integer :: accepted_moves, accepted_moves_b, rejected_moves, j, step
     real(8) :: coord(3, n_atoms), phi_rot
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
-    real(8) :: tower(n_atoms-3), temp
+    real(8) :: tower(n_atoms-3), temp, alpha
     integer(8) :: seed
     integer :: status
     character(len=20) :: arg
+    integer :: step_ini, step_end, step_size
     
     !Initial seed
     seed = 123456789 
@@ -22,17 +23,17 @@ program main
     call get_command_argument(1, arg, status=status)
 
     if (status == 0) then
-        read(arg, *) i_temp
+        read(arg, *) f_temp
     else
-        print *, "No temperature provided. Using default T=1000 K."
-        i_temp = 1000.0d0
+        print *, "No temperature provided. Using default T=300 K."
+        f_temp = 300.0d0
     end if
 
     ! Initialize parameters
     accepted_moves = 0
     accepted_moves_b = 0
     rejected_moves = 0
-    temp = i_temp
+    temp = 2500.0d0 ! Starting temperature
 
     ! Initialize coordinates (linear zig-zag configuration)
     call init_conf(coord, 'initial_config.xyz')
@@ -58,15 +59,26 @@ program main
     call write_coord(2, coord, step = step)
     write(3, *) energy, E_LJ, E_dih, temp
 
+    !Alpha for temperature modification
+    alpha = (f_temp/2500.0d0)**(1.0d0/REAL(T_blocks)) ! We want to reach 2500 K at the end of the temperature modification blocks
+
+    !Control points of the simulation
+    step_ini = nint(n_steps * 0.15) ! 15%
+    step_end = nint(n_steps * 0.6)  ! 60%
+    step_size =  (step_end- step_ini)/ T_blocks
+
     !Main Monte Carlo loop
     do step = 1, n_steps
 
         ! Generate a random rotation angle for the dihedral rotation
         phi_rot = (get_random() - 0.5d0) * 2.0d0 * phi_CC_mod
         
-        !Temperature modification starting at 10% of the total steps and every n_steps/T_blocks steps
-        if (step > n_steps/10 .and. mod(step- (n_steps/10), n_steps/T_blocks) == 0 .and. step < n_steps/2) then
-            temp = temp * alpha
+        !Temperature modification starting at 15% to the 60% of the total steps and every n_steps/T_blocks steps
+        if (step > step_ini .and. step <= step_end) then
+            if (mod(step -step_ini, step_size) == 0) then
+                temp = temp * alpha
+                print *, 'Modifying temperature. Current temperature: ', temp, ' K'
+            end if
         end if
         
         ! Perform a Monte Carlo step
@@ -80,7 +92,7 @@ program main
             write(3, *) energy, E_LJ, E_dih, temp
 
             !We write angles and distances when equilibration is reached
-            if (step > n_steps/2) then
+            if (step > (n_steps*6)/10) then
                  write(5, *) end_end_dist(coord), rad_gyr(coord)
                 do j = 1, n_atoms-3
                     write(4, *) dihedral_lst(j)

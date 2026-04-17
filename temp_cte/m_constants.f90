@@ -9,10 +9,10 @@ module m_constants
     real(8), parameter :: r_cut       = 10.5d0    ! Angstroms
     real(8), parameter :: Kb          = 8.314d-3  ! kJ/mol/K
 
-    integer, parameter :: k_factor    = 2         !Scaling factor in probability to choose a dihedral angle
+    integer, parameter :: k_factor    = 1         !Scaling factor in probability to choose a dihedral angle
     integer, parameter :: n_atoms     = 500
     integer, parameter :: l_box       = 2000      ! Angstroms
-    integer, parameter :: n_steps     = 200000
+    integer, parameter :: n_steps     = 1000000
 
     real(8)            :: temp        = 1000.0d0    !Default temperature
 

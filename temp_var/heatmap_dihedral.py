@@ -4,7 +4,7 @@ import seaborn as sns
 import os
 
 # Temperature list
-temps = [1000.0, 1300.0, 1600.0, 1900.0, 2200.0, 2500.0]
+temps = [200.0, 300.0, 400.0, 500.0, 600.0, 700.0]
 
 data_dict = {}
 

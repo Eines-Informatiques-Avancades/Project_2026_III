@@ -6,17 +6,16 @@ module m_constants
     real(8), parameter :: phi_CC_mod  = 60.0d0    ! Degrees (dihedral)
     real(8), parameter :: sigma       = 4.01d0    ! LJ parameter
     real(8), parameter :: epsil       = 0.469d0   ! kJ/mol   
-    real(8), parameter :: alpha       = 0.96d0    ! Scaling factor for temperature
     real(8), parameter :: r_cut       = 10.5d0    ! Angstroms
     real(8), parameter :: Kb          = 8.314d-3  ! kJ/mol/K
 
-    integer, parameter :: k_factor    = 2         !Scaling factor in probability to choose a dihedral angle
+    integer, parameter :: k_factor    = 1         !Scaling factor in probability to choose a dihedral angle
     integer, parameter :: n_atoms     = 500
     integer, parameter :: l_box       = 2000      ! Angstroms
-    integer, parameter :: n_steps     = 200000
-    integer, parameter :: T_blocks    = 100       ! Number of times we change temperature
+    integer, parameter :: n_steps     = 1000000
+    integer, parameter :: T_blocks    = 15       ! Number of times we change temperature
 
-    real(8)            :: i_temp      = 1000.0d0  ! Default temperature in K
+    real(8)            :: f_temp      = 300.0d0  ! Default temperature in K
     
 
 end module m_constants

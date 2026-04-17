@@ -12,7 +12,7 @@ module m_MC_step
          accepted_moves, rejected_moves, energy, dihedral_lst, &
          E_LJ, E_dih, temp)
         real(8), intent(in) :: phi_rot, tower(n_atoms-3), temp
-        real(8) :: rand_num, new_phi_lst(n_atoms-3), old_coord(3, n_atoms)
+        real(8) :: new_phi_lst(n_atoms-3), old_coord(3, n_atoms)
         real(8) :: E_LJ_new, E_dih_new, new_energy
         real(8), intent(inout) :: coord(3, n_atoms), energy, dihedral_lst(n_atoms-3), E_LJ, E_dih
         integer, intent(inout):: accepted_moves, rejected_moves

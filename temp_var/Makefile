@@ -58,7 +58,7 @@ main.o: main.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o m_energy.o m_
 .PHONY: all
 
 # --- Configuration of the simulation ---
-TEMPS = 1000.0 1300.0 1600.0 1900.0 2200.0 2500.0
+TEMPS = 200.0 300.0 400.0 500.0 600.0 700.0
 
 .PHONY: run_all
 run_all: $(TARGET)
@@ -67,7 +67,7 @@ run_all: $(TARGET)
 		mkdir -p T_$$t; \
 		echo "Running T=$$t..."; \
 		./$(TARGET) $$t > T_$$t/log.txt; \
-		mv energy.txt distances.txt dihedral_angles.txt distances.txt trajectory.xyz T_$$t/ 2>/dev/null || true; \
+		mv energy.txt distances.txt dihedral_angles.txt distances.txt trayectory.xyz T_$$t/ 2>/dev/null || true; \
 	done
 	@echo "Simulations finished. Executing global analysis..."
 	python3 energy_analysis.py

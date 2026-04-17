@@ -4,7 +4,7 @@ import glob
 import os
 
 # Temperature list
-temps = [1000.0, 1300.0, 1600.0, 1900.0, 2200.0, 2500.0]
+temps = [200.0, 300.0, 400.0, 500.0, 600.0, 700.0]
 energy_means = []
 energy_fluctuations = []
 
@@ -14,11 +14,11 @@ for t in temps:
     if os.path.exists(ruta):
         data = np.loadtxt(ruta, usecols = 0)
 
-        half = len(data) // 2
+        eq_index = (len(data) * 6 // 10)
 
         # We take equilibrium data (second half of the simulation)
     
-        equilibrium_data = data[half:] 
+        equilibrium_data = data[eq_index:] 
         
         energy_means.append(np.mean(equilibrium_data))
         energy_fluctuations.append(np.std(equilibrium_data))
