@@ -4,8 +4,8 @@
 #$ -q cerqt03.q
 #$ -S /bin/csh
 #$ -cwd
-#$ -o MC.out
-#$ -e MC.err
+#$ -o run.out
+#$ -e run.err
 ##########################################
 # User environment.
 ##########################################
@@ -19,7 +19,9 @@ module load intel_compiler_suite/2023.0 openmpi/4.1.6_ics-2023.0
 # Copying files needed
 ##########################################
 
-setenv old `pwd`
+setenv old $cwd
+
+setenv root_pro $old/../..
 
 setenv OMP_NUM_THREADS $NSLOTS
 
@@ -28,6 +30,7 @@ setenv OMP_NUM_THREADS $NSLOTS
 if ( ! $?TMPDIR ) then
     setenv TMPDIR /tmp/$USER/job_test
     mkdir -p $TMPDIR
+    echo "TMPDIR created"
 endif
 
 #We clean TMPDIR
@@ -37,28 +40,36 @@ make clean_tmpdir
 
 #Copy my files to tmpdir
 
-cp -r $old/* $TMPDIR/
+cp -r $root_pro/* $TMPDIR
 
-pwd
+echo $cwd
 
 #Making PARALEL RESULTS directory
-mkdir -p $TMPDIR/PARALEL_RESULTS
-mkdir -p $old/PARALEL_RESULTS
+mkdir -p $TMPDIR/RESULTS
+mkdir -p $old/RESULTS
+
+#Extracting modules needed for the parallel program
+mv modules/* .
+mv omp_modules/* .
+mv main/main_temp_var_par.f90 .
 
 ##########################################
 # Run the job
 ##########################################
 # We compile and run parallel program
 
-make run_all PARAL=1 
+echo $cwd
+
+make run_par_var PARAL=1
 
 # Execute simulation (OMP_NUM_THREADS is set in Makefile)
-./programa_mc.exe
+./programa_par_var.exe
 
 ##########################################
 # Copy the results to our home directory
 ##########################################
 
-cp timing_data.txt $TMPDIR/PARALEL_RESULTS/ >& /dev/null
-cp -r PARALEL_RESULTS/* $old/PARALEL_RESULTS/ >& /dev/null
+cp timing_data.txt $TMPDIR/RESULTS/ >& /dev/null
+cp -r RESULTS/* $old/RESULTS/ >& /dev/null
+
 

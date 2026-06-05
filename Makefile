@@ -62,30 +62,29 @@ $(TARGET_SEC_VAR): $(OBJ_SEC_VAR)
 %.o: %.f90
 	$(FC) $(FFLAGS) -c $<
 
-m_init_conf.o: modules/m_init_conf.f90 m_constants.o
-m_rot_dihedral.o: modules/m_rot_dihedral.f90 m_constants.o
-m_energy.o: modules/m_energy.f90 m_constants.o m_rot_dihedral.o
-m_write.o: modules/m_write.f90 m_constants.o
-m_tower.o: modules/m_tower.f90 m_constants.o m_ran_gen.o
-m_distances.o: modules/m_distances.f90 m_constants.o
-m_ran_gen.o: modules/m_ran_gen.f90
-m_MC_step.o: modules/m_MC_step.f90 m_constants.o m_energy.o m_rot_dihedral.o m_ran_gen.o m_tower.o
-main_temp_cte_par.o: main/main_temp_cte_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
-main_temp_var_par.o: main/main_temp_var_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
+m_constants.o: m_constants.f90
+m_init_conf.o: m_init_conf.f90 m_constants.o
+m_rot_dihedral.o: m_rot_dihedral.f90 m_constants.o
+m_energy.o: m_energy.f90 m_constants.o m_rot_dihedral.o
+m_write.o: m_write.f90 m_constants.o
+m_tower.o: m_tower.f90 m_constants.o m_ran_gen.o
+m_distances.o: m_distances.f90 m_constants.o
+m_ran_gen.o: m_ran_gen.f90
+m_MC_step.o: m_MC_step.f90 m_constants.o m_energy.o m_rot_dihedral.o m_ran_gen.o m_tower.o
 
-m_rot_dihedral_par.o: omp_modules/m_rot_dihedral_par.f90 m_constants.o
-m_energy_par.o: omp_modules/m_energy_par.f90 m_constants.o m_rot_dihedral_par.o
-m_MC_step_par.o: omp_modules/m_MC_step_par.f90 m_constants.o m_energy_par.o m_rot_dihedral_par.o m_ran_gen.o m_tower.o
+m_rot_dihedral_par.o: m_rot_dihedral_par.f90 m_constants.o
+m_energy_par.o: m_energy_par.f90 m_constants.o m_rot_dihedral_par.o
+m_MC_step_par.o: m_MC_step_par.f90 m_constants.o m_energy_par.o m_rot_dihedral_par.o m_ran_gen.o m_tower.o
 
-main_temp_cte_par.o: main/main_temp_cte_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
-main_temp_var_par.o: main/main_temp_var_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
-main_temp_cte_sec.o: main/main_temp_cte_sec.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o m_energy.o m_distances.o
-main_temp_var_sec.o: main/main_temp_var_sec.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o m_energy.o m_distances.o
+main_temp_cte_par.o: main_temp_cte_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
+main_temp_var_par.o: main_temp_var_par.f90 m_MC_step_par.o m_write.o m_constants.o m_init_conf.o m_energy_par.o m_distances.o
+main_temp_cte_sec.o: main_temp_cte_sec.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o m_energy.o m_distances.o
+main_temp_var_sec.o: main_temp_var_sec.f90 m_MC_step.o m_write.o m_constants.o m_init_conf.o m_energy.o m_distances.o
 
 # --- Configuration of the simulation ---
 TEMPS = 200.0 300.0 400.0 500.0 600.0 700.0
 
-.PHONY: run_all
+.PHONY: run_par_cte run_par_var run_sec_cte run_sec_var
 .PHONY: plot_general
 run_par_cte: $(TARGET_PAR_CTE)
 run_par_var: $(TARGET_PAR_VAR)
@@ -95,7 +94,7 @@ run_sec_var: $(TARGET_SEC_VAR)
 #General plots
 
 plot_general:$(ALL_TXT)
-	mkdir -p PARALEL_RESULTS/GENERAL_PLOTS/ 
+	mkdir -p RESULTS/GENERAL_PLOTS/ 
 	@echo "Generating general plots."
 	python3 energy_analysis.py
 	python3 gyr_rad_analysis.py
@@ -104,27 +103,27 @@ plot_general:$(ALL_TXT)
 
 #Local plots for each temperature
 
-ALL_PNGS = $(foreach t, $(TEMPS), PARALEL_RESULTS/LOCAL_PLOTS/T_$(t)/dih_dist.png PARALEL_RESULTS/LOCAL_PLOTS/T_$(t)/energy.png PARALEL_RESULTS/LOCAL_PLOTS/T_$(t)/distances.png)
-ALL_TXT =  $(foreach t, $(TEMPS), T_$(t)/dihedral_angles.txt T_$(t)/energy.txt T_$(t)/distances.txt)
+ALL_PNGS = $(foreach t, $(TEMPS), RESULTS/LOCAL_PLOTS/T_$(t)/dih_dist.png RESULTS/LOCAL_PLOTS/T_$(t)/energy.png RESULTS/LOCAL_PLOTS/T_$(t)/distances.png)
+ALL_TXT =  $(foreach t, $(TEMPS), RESULTS/T_$(t)/dihedral_angles.txt RESULTS/T_$(t)/energy.txt RESULTS/T_$(t)/distances.txt)
 
 .PHONY: plot_local
 
 plot_local: $(ALL_PNGS)
 	@echo "Local plots generated."
 
-PARALEL_RESULTS/LOCAL_PLOTS/T_%/dih_dist.png: PARALEL_RESULTS/T_%/dihedral_angles.txt
-	mkdir -p PARALEL_RESULTS/LOCAL_PLOTS/T_$*/
+RESULTS/LOCAL_PLOTS/T_%/dih_dist.png: RESULTS/T_%/dihedral_angles.txt
+	mkdir -p RESULTS/LOCAL_PLOTS/T_$*/
 	@echo "Generating dihedral angle distribution for T=$*..."
-	gnuplot -e "INFILE='PARALEL_RESULTS/T_$*/dihedral_angles.txt'; OUTFILE='$@'; TEMP='$*'" dihedral.gnu
+	gnuplot -e "INFILE='RESULTS/T_$*/dihedral_angles.txt'; OUTFILE='$@'; TEMP='$*'" dihedral.gnu
 
-PARALEL_RESULTS/LOCAL_PLOTS/T_%/energy.png: PARALEL_RESULTS/T_%/energy.txt
+RESULTS/LOCAL_PLOTS/T_%/energy.png: RESULTS/T_%/energy.txt
 	@echo "Generating energy plot for T=$*..."
-	gnuplot -e "INFILE='PARALEL_RESULTS/T_$*/energy.txt'; OUTFILE='$@'; TEMP='$*'" energy.gnu
+	gnuplot -e "INFILE='RESULTS/T_$*/energy.txt'; OUTFILE='$@'; TEMP='$*'" energy.gnu
 
 
-PARALEL_RESULTS/LOCAL_PLOTS/T_%/distances.png: PARALEL_RESULTS/T_%/distances.txt
+RESULTS/LOCAL_PLOTS/T_%/distances.png: RESULTS/T_%/distances.txt
 	@echo "Generating distance distribution for T=$*..."
-	gnuplot -e "INFILE='PARALEL_RESULTS/T_$*/distances.txt'; OUTFILE='$@'; TEMP='$*'" distances.gnu
+	gnuplot -e "INFILE='RESULTS/T_$*/distances.txt'; OUTFILE='$@'; TEMP='$*'" distances.gnu
 
 
 
@@ -139,4 +138,7 @@ clean_tmpdir:
 # 'Make clean_results' only to cleaning directories of simulation
 clean_results:
 	@echo "Cleaning analysis files and directories..."
-	rm -rf PARALEL_RESULTS/ *.err *.out 
+	rm -rf paralel/temp_cte/RESULTS/ paralel/temp_cte/*.err paralel/temp_cte/*.out 
+	rm -rf paralel/temp_var/RESULTS/ paralel/temp_var/*.err paralel/temp_var/*.out
+	rm -rf secuencial/temp_cte/RESULTS/ secuencial/temp_cte/*.err secuencial/temp_cte/*.out
+	rm -rf secuencial/temp_var/RESULTS/ secuencial/temp_var/*.err secuencial/temp_var/*.out

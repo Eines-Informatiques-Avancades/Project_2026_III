@@ -1,10 +1,10 @@
 #!/bin/csh
-#$ -N paralel_sim
+#$ -N MC_sim
 #$ -q cerqt03.q
 #$ -S /bin/csh
 #$ -cwd
-#$ -o MC.out
-#$ -e MC.err
+#$ -o run.out
+#$ -e run.err
 ##########################################
 # User environment.
 ##########################################
@@ -18,13 +18,16 @@ module load intel_compiler_suite/2023.0
 # Copying files needed
 ##########################################
 
-setenv old `pwd`
+setenv old $cwd
+
+setenv root_pro $old/../..
 
 #If TMPDIR does not exist, we define it
 
 if ( ! $?TMPDIR ) then
     setenv TMPDIR /tmp/$USER/job_test
     mkdir -p $TMPDIR
+    echo "TMPDIR created"
 endif
 
 #We clean TMPDIR
@@ -34,28 +37,34 @@ make clean_tmpdir
 
 #Copy my files to tmpdir
 
-cp -r $old/* $TMPDIR/
+cp -r $root_pro/* $TMPDIR
 
-pwd
+echo $cwd
 
-#Making SEQUENTIAL RESULTS directory
-mkdir -p $TMPDIR/SEQUENTIAL_RESULTS
-mkdir -p $old/SEQUENTIAL_RESULTS
+#Making SECUENTIAL RESULTS directory
+mkdir -p $TMPDIR/RESULTS
+mkdir -p $old/RESULTS
+
+#Extracting modules needed for the parallel program
+mv modules/* .
+mv main/main_temp_cte_sec.f90 .
 
 ##########################################
 # Run the job
 ##########################################
 # We compile and run parallel program
 
-make run_all
+echo $cwd
+
+make run_sec_cte
 
 # Execute simulation (OMP_NUM_THREADS is set in Makefile)
-./programa_mc.exe
+./programa_sec_cte.exe
 
 ##########################################
 # Copy the results to our home directory
 ##########################################
 
-cp timing_data.txt $TMPDIR/SEQUENTIAL_RESULTS/ >& /dev/null
-cp -r SEQUENTIAL_RESULTS/* $old/SEQUENTIAL_RESULTS/ >& /dev/null
+cp $TMPDIR/RESULTS/ >& /dev/null
+cp -r RESULTS/* $old/RESULTS/ >& /dev/null
 

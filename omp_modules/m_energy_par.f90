@@ -1,6 +1,6 @@
 module m_energy_par
     use m_constants
-    use m_rot_dihedral
+    use m_rot_dihedral_par
     use :: omp_lib
     implicit none
 contains

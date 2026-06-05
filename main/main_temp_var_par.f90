@@ -1,10 +1,10 @@
 program main
-    use m_MC_step
+    use m_MC_step_par
     use m_init_conf
     use m_constants
     use m_write
     use m_distances
-    use m_energy
+    use m_energy_par
     use :: omp_lib
     implicit none
 
@@ -13,7 +13,6 @@ program main
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
     real(8) :: tower(n_atoms-3), temp, alpha
     integer :: seed
-    integer :: tid
     real(8) :: temps(6)
     integer :: i
     character(len=50) :: dir_name, filename
@@ -33,8 +32,8 @@ program main
         
         temp = temps(i)
                 
-        ! Create directory for this temperature inside PARALEL_RESULTS
-        write(dir_name, '(A,F0.1)') 'PARALEL_RESULTS/T_', temp
+        ! Create directory for this temperature inside RESULTS
+        write(dir_name, '(A,F0.1)') 'RESULTS/T_', temp
         call system('mkdir -p '//trim(dir_name))
         
         ! Initialize parameters
@@ -95,7 +94,6 @@ program main
                 if (mod(step -step_ini, step_size) == 0) then
                     temp = temp * alpha
                     if (mod(step, n_steps/10) == 0) then
-                        print *, 'Thread', tid, 'T=', temps(i), 'Modifying temperature. Current temperature: ', temp, ' K'
                     end if
                 end if
             end if
@@ -121,7 +119,7 @@ program main
 
             ! Print progress every 10% of the total steps
             if(mod(step, n_steps/10) == 0) then
-                print *, 'Thread', tid, 'T=', temps(i), step/(n_steps/100), '% completed', &
+                print *, 'T=', temps(i), step/(n_steps/100), '% completed', &
                         'Accepted:', accepted_moves, 'Rejected : ', rejected_moves
             end if
         end do
@@ -131,7 +129,7 @@ program main
         close(4)
         close(5)
         call close_rng() ! Close the random number generator
-        print *, 'Thread', tid, 'T=', temps(i), 'Simulation completed. Total accepted moves: ', &
+        print *, 'T=', temps(i), 'Simulation completed. Total accepted moves: ', &
                  accepted_moves, 'Total rejected moves: ', rejected_moves
     end do
     

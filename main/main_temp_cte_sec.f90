@@ -26,8 +26,8 @@ program main
     do i = 1, 6
         temp = temps(i)
         
-        ! Create directory for this temperature inside PARALEL_RESULTS
-        write(dir_name, '(A,F0.1)') 'PARALEL_RESULTS/T_', temp
+        ! Create directory for this temperature inside RESULTS
+        write(dir_name, '(A,F0.1)') 'RESULTS/T_', temp
         call system('mkdir -p '//trim(dir_name))
         
         ! Initialize parameters
