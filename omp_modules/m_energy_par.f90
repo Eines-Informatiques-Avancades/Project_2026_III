@@ -1,4 +1,4 @@
-module m_energy
+module m_energy_par
     use m_constants
     use m_rot_dihedral
     use :: omp_lib
@@ -93,9 +93,4 @@ contains
 
     end subroutine calc_energy
 
-
-
-
-    
-
-end module m_energy
+end module m_energy_par

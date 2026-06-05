@@ -5,19 +5,16 @@ program main
     use m_write
     use m_distances
     use m_energy
-    use :: omp_lib
     implicit none
 
     integer :: accepted_moves, accepted_moves_b, rejected_moves, j, step
     real(8) :: coord(3, n_atoms), phi_rot
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
     real(8) :: tower(n_atoms-3), temp, alpha
-    integer(8) :: seed
-    integer :: tid
+    integer :: seed
     real(8) :: temps(6)
     integer :: i
     character(len=50) :: dir_name, filename
-    real(8) :: start_time, end_time
     integer :: step_ini, step_end, step_size
     
     ! Temperature array
@@ -26,7 +23,6 @@ program main
     !Initial seed
     seed = 123456789
     
-    start_time = omp_get_wtime()
     
 
     do i = 1, 6
@@ -121,7 +117,7 @@ program main
 
             ! Print progress every 10% of the total steps
             if(mod(step, n_steps/10) == 0) then
-                print *, 'Thread', tid, 'T=', temps(i), step/(n_steps/100), '% completed', &
+                print *,  'T=', temps(i), step/(n_steps/100), '% completed', &
                         'Accepted:', accepted_moves, 'Rejected : ', rejected_moves
             end if
         end do
@@ -131,37 +127,13 @@ program main
         close(4)
         close(5)
         call close_rng() ! Close the random number generator
-        print *, 'Thread', tid, 'T=', temps(i), 'Simulation completed. Total accepted moves: ', &
+        print *,  'T=', temps(i), 'Simulation completed. Total accepted moves: ', &
                  accepted_moves, 'Total rejected moves: ', rejected_moves
     end do
     
-    end_time = omp_get_wtime()
     print *, "All simulations completed."
-    print *, "Total execution time:", end_time - start_time, "seconds"
     
-    ! Save timing data to file
-    call save_timing_data(end_time - start_time)
     
 end program main
 
-! Subroutine to save timing data
-subroutine save_timing_data(execution_time)
-    implicit none
-    real(8), intent(in) :: execution_time
-    integer :: unit_num
-    character(len=100) :: filename
-    
-    ! Generate filename
-    write(filename, '(A,I0,A)') 'timing_data.txt'
-    
-    ! Open file in append mode
-    open(newunit=unit_num, file=filename, status='unknown', position='append')
-    
-    ! Write timing data
-    write(unit_num, '(A,F12.6,A,I0,A)') 'PARALLEL_VAR: ', execution_time, ' seconds'
-    
-    close(unit_num)
-    print *, "Timing data saved to: ", trim(filename)
-    
-end subroutine save_timing_data
    

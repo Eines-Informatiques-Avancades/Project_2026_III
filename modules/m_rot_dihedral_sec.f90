@@ -1,6 +1,5 @@
 module m_rot_dihedral
     use m_constants, only: phi_CC_mod, n_atoms
-    use :: omp_lib
     implicit none
 
     contains
@@ -119,14 +118,11 @@ module m_rot_dihedral
         real(8) :: lst(n_atoms-3)
         integer :: i
 
-        !$omp parallel do schedule(static) &
-        !$omp default(none) &
-        !$omp shared(coord, lst) &
-        !$omp private(i)
+    
         do i = 3, n_atoms-1
             lst(i-2) = calc_dihedral(coord, i)
         end do
-        !$omp end parallel do
+
 
     end function phi_lst
 

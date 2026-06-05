@@ -1,8 +1,8 @@
-module m_MC_step
+module m_MC_step_par
     use m_constants
-    use m_rot_dihedral
+    use m_rot_dihedral_par
     use m_ran_gen
-    use m_energy
+    use m_energy_par
     use m_tower
     implicit none
     contains
@@ -10,9 +10,9 @@ module m_MC_step
     !It performs one MC step
     subroutine MC_step(coord, phi_rot, tower, &
          accepted_moves, rejected_moves, energy, dihedral_lst, &
-         E_LJ, E_dih, temp)
-        real(8), intent(in) :: phi_rot, tower(n_atoms-3), temp
-        real(8) :: new_phi_lst(n_atoms-3), old_coord(3, n_atoms)
+         E_LJ, E_dih)
+        real(8), intent(in) :: phi_rot, tower(n_atoms-3)
+        real(8) :: rand_num, new_phi_lst(n_atoms-3), old_coord(3, n_atoms)
         real(8) :: E_LJ_new, E_dih_new, new_energy
         real(8), intent(inout) :: coord(3, n_atoms), energy, dihedral_lst(n_atoms-3), E_LJ, E_dih
         integer, intent(inout):: accepted_moves, rejected_moves
@@ -24,8 +24,8 @@ module m_MC_step
         ! Store the old coordinates before rotation
         old_coord = coord 
         
-        ! Perform the dihedral rotation on the selected atom
-        call dihedral_rotation(rand_atom, coord, phi_rot, n_atoms) 
+        ! Perform the dihedral rotation of the selected atom
+        call dihedral_rotation(rand_atom, coord, phi_rot, n_atoms) ! Rotate the dihedral angle of the selected atom   
        
         ! Calculate the dihedral angles list for the new configuration
         new_phi_lst = phi_lst(coord)
@@ -33,9 +33,10 @@ module m_MC_step
         !Calculate the energy of the new configuration
         call calc_energy(coord, new_phi_lst, E_LJ_new, E_dih_new) 
 
-        ! Total energy of the new configuration
+        !Total energy of the new configuration
         new_energy = E_LJ_new + E_dih_new 
 
+        
         !Acept if new energy is lower
         if (new_energy < energy) then
             accepted_moves = accepted_moves + 1
@@ -60,5 +61,5 @@ module m_MC_step
 
     end subroutine MC_step
 
-end module m_MC_step
+end module m_MC_step_par
 

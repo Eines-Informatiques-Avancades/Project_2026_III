@@ -1,7 +1,6 @@
 module m_energy
     use m_constants
     use m_rot_dihedral
-    use :: omp_lib
     implicit none
 contains
 
@@ -51,11 +50,6 @@ contains
         r_cut6_inv = r_cut2_inv**3
         E_cut = epsil_4 * (sigma12 * r_cut6_inv**2 - sigma6 * r_cut6_inv)
 
-        !$omp parallel do schedule(guided) &
-        !$omp default(none) &
-        !$omp shared(coord, epsil_4, sigma6, sigma12, r_cut2) &
-        !$omp private(i, j, dx, dy, dz, r2, r2_inv, r6_inv) &
-        !$omp reduction(+:E, k)
         do i = 1, n_atoms-4
             do j = i+4, n_atoms
             !We calculate r2
@@ -73,7 +67,6 @@ contains
                 end if
             end do
         end do
-        !$omp end parallel do
         E = E - dble(k) * E_cut
 
     end function LJ_energy

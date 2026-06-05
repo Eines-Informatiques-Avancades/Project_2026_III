@@ -19,7 +19,9 @@ module load intel_compiler_suite/2023.0 openmpi/4.1.6_ics-2023.0
 # Copying files needed
 ##########################################
 
-setenv old `pwd`
+setenv old $cwd
+
+setenv root_pro $old/../..
 
 setenv OMP_NUM_THREADS $NSLOTS
 
@@ -37,7 +39,7 @@ make clean_tmpdir
 
 #Copy my files to tmpdir
 
-cp -r $old/* $TMPDIR/
+cp -r $root_pro/* $TMPDIR/
 
 pwd
 
@@ -50,7 +52,7 @@ mkdir -p $old/PARALEL_RESULTS
 ##########################################
 # We compile and run parallel program
 
-make run_all PARAL=1 
+make run_par_cte PARAL = 1
 
 # Execute simulation (OMP_NUM_THREADS is set in Makefile)
 ./programa_mc.exe

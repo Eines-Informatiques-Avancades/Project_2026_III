@@ -12,7 +12,7 @@ program main
     real(8) :: coord(3, n_atoms), phi_rot
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
     real(8) :: tower(n_atoms-3), temp, alpha
-    integer(8) :: seed
+    integer :: seed
     integer :: tid
     real(8) :: temps(6)
     integer :: i

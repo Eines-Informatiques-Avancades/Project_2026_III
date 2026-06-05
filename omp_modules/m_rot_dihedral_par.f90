@@ -1,4 +1,4 @@
-module m_rot_dihedral
+module m_rot_dihedral_par
     use m_constants, only: phi_CC_mod, n_atoms
     use :: omp_lib
     implicit none
@@ -133,7 +133,7 @@ module m_rot_dihedral
 
 
 
-end module m_rot_dihedral
+end module m_rot_dihedral_par
 
 
 

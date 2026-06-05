@@ -100,7 +100,7 @@ program main
 
             ! Print progress every 10% of the total steps
             if(mod(step, n_steps/10) == 0) then
-                print *, 'T=', temp, step/(n_steps/100), '% completed', &
+                print *, 'Thread', tid, 'T=', temps(i), step/(n_steps/100), '% completed', &
                         'Accepted:', accepted_moves, 'Rejected : ', rejected_moves
             end if
         end do
@@ -110,6 +110,8 @@ program main
         close(4)
         close(5)
         call close_rng() ! Close the random number generator
+        print *, 'Thread', tid, 'T=', temps(i), 'Simulation completed. Total accepted moves: ', &
+                 accepted_moves, 'Total rejected moves: ', rejected_moves
     end do
     
     end_time = omp_get_wtime()
