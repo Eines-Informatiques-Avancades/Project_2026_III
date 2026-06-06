@@ -8,7 +8,7 @@ temps = [200.0, 300.0, 400.0, 500.0, 600.0, 700.0]
 data_dict = {}
 
 for t in temps:
-    ruta = f"PARALEL_RESULTS/T_{t}/dihedral_angles.txt"
+    ruta = f"RESULTS/T_{t}/dihedral_angles.txt"
     if os.path.exists(ruta):
         data = np.loadtxt(ruta, usecols=0)
         data_dict[t] = data
@@ -56,7 +56,7 @@ plt.gca().invert_yaxis()
 
 #Saving the plot in the directory GENERAL_PLOTS
 working_dir = os.getcwd()
-output_dir = os.path.join(working_dir, "PARALEL_RESULTS", "GENERAL_PLOTS")
+output_dir = os.path.join(working_dir, "RESULTS", "GENERAL_PLOTS")
 os.makedirs(output_dir, exist_ok=True)  # Crea GENERAL_PLOTS si no existe
 output_path = os.path.join(
     output_dir, "3_Heatmap_Dihedral_Angles_vs_Temperature.png"

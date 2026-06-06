@@ -16,52 +16,146 @@ Dihedral energy function $E(\phi)$ in polyethylene chains and LJ parameters extr
 [Read article here](https://www-sciencedirect-com.sire.ub.edu/science/article/pii/S2213138822001485)
 
 ## Prerequisites
-You must have the following tools installed:
-* `fgsl`: Fortran interface for GSL.
-* `gfortran`: GNU Compiler.
-* `gnuplot`: Visualization tool.
+This program was done to be executted in cerqt03.q node. Acces to this node is unique requisite
 
 ## Project Structure
-| Directory | Description |
-| :--- | :--- |
-| `temp_cte` | Monte Carlo simulations at constant temperature ($T = \text{const}$). |
-| `temp_var` | Monte Carlo Simulations with variable initial temperatures ($T_0$). |
+
+The proyect `Project_2026_III` have the following files and directories organization:
+
+```text
+Project_2026_III/
+├── Makefile
+├── README.md
+├── bin/
+├── gen_plot_scripts/
+│   ├── energy_analysis.py
+│   ├── gyr_rad_analysis.py
+│   └── heatmap_dihedral.py
+├── local_plot_scripts/
+│   ├── dihedral.gnu
+│   ├── distances.gnu
+│   └── energy.gnu
+├── main/
+│   ├── main_temp_cte_par.f90
+│   ├── main_temp_var_par.f90
+│   ├── main_temp_cte_sec.f90
+│   └── main_temp_var_sec.f90
+├── modules/
+│   ├── m_MC_step.f90
+│   ├── m_constants.f90
+│   ├── m_distances.f90
+│   ├── m_energy.f90
+│   ├── m_init_conf.f90
+│   ├── m_ran_gen.f90
+│   ├── m_rot_dihedral.f90
+│   ├── m_tower.f90
+│   └── m_write.f90
+├── omp_modules/
+│   ├── m_MC_step_par.f90
+│   ├── m_energy_par.f90
+│   └── m_rot_dihedral_par.f90
+├── paralel/
+│   ├── temp_cte/
+│   │   └── run.sh
+│   └── temp_var/
+│       └── run.sh
+├── secuential/
+│   ├── temp_cte/
+│   │   └── run.sh
+│   └── temp_var/
+│       └── run.sh
+└── paralel_analysis/
+    ├── efficiency.png
+    ├── speedup.png
+    ├── plot_speedup_efficiency.py
+    └── speedup_per_thread.txt
+```
 
 ### Directory Contents
-Each folder contains a self-contained environment with:
-* **Automation**: A `Makefile` to manage compilation and execution.
-* **Fortran Source**: 1 main program and 9 specialized modules (`.f90`).
-* **Analysis Scripts**: 
-  * 3 **Gnuplot** scripts for immediate visualization.
-  * 3 **Python** scripts for advanced data processing.
 
-# Execution Guide
-Navigate to each directory (`temp_cte` or `temp_var`) and run the following `make` commands in order:
+* **`bin/`**: Contains the pre-compiled standalone binary executable of Gnuplot, ensuring the plotting scripts can run seamlessly on any cluster node without depending on system-wide installations.
+* **`gen_plot_scripts/`**: Includes Python scripts designed to generate plots comparing different physical magnitudes across multiple simulations at various temperatures.
+* **`local_plot_scripts/`**: Contains Gnuplot scripts used to generate plots of different magnitudes for a single simulation at a specific reference temperature.
+* **`modules/`**: Contains the core, non-parallelized Fortran modules containing the subroutines and functions for the simulation.
+* **`omp_modules/`**: Contains the Fortran modules that have been parallelized using OpenMP (`omp`) to improve performance.
+* **`main/`**: Holds the four main Fortran program files, separated according to the simulation parameters: constant vs. variable temperature, and sequential vs. parallel execution.
+* **`paralel/` & `secuential/`**: Contain the `run.sh` bash scripts used to submit the simulation jobs to the cluster queue and gather the resulting data.
+* **`paralel_analysis/`**: Contains the performance analysis of the OpenMP implementation. It includes two `.png` plots showing the efficiency and speedup as a function of the number of threads, a `.txt` file collecting the exact computation times for each thread configuration, and the Python script used to generate these visualizations.
 
-### 1. Main Simulations
-* **`make run_all`**
-  Runs simulations for **6 different temperatures**. It creates 6 directories with 5 files of data:
-  * Distances.txt: it contains the squared radious of gyration and the squared end-to-end distance data during second half of simulation
-  * Dihedral_angles.txt: it contains a list of all dihedral angles during second half of the simulation
-  * Energy.txt: It contains total energy, LJ energy, dihedral energy and temperature (only in the simulation whixh temperature varies) of second half of the simulation
-  * Trayectory.xyz: contains the coordinates of the molecule during siumlation
-  * Log.txt: contains printed text during simulation
-   
-  and generates 3 summary files analyzing the evolution of:
-  * Mean squared radius of gyration ($R_g^2$) vs T.
-  * System energy vs T.
-  * Dihedral angle distribution relative to temperature vs T.
+## Execution Guide
 
-* **`make all`**
-  If you want to execute a **single simulation** at a predefined temperature.
+Before starting, ensure that the entire project folder is uploaded to your personal directory on the cluster.
 
-### 2. Visualization
-* **`make plot_local`**
-  Generates graphs from the `.txt` files located within each temperature directory.
+### 1. Running the Simulations
 
-### 3. Cleanup
-* **`make clean`**
-  Removes all compiled files (`.mod`, `.o`), as well as the generated analysis directories and files.
-  
-* **`make clean_results`**
-  Removes **only** the generated analysis directories and output files, keeping the compiled binaries intact.
+The first step is to execute the Fortran code to generate the simulation data. 
+
+1.  **Choose your execution mode:** Navigate to either the `paralel/` directory (for OpenMP parallel execution) or the `secuencial/` directory (for single-thread execution).
+2.  **Choose your temperature scheme:** * If you want to run simulations at 6 fixed temperatures (where the temperature remains constant during each simulation), navigate to the `temp_cte/` subdirectory.
+    * If you want the temperature to vary during the simulation, navigate to the `temp_var/` subdirectory.
+3.  **Submit the job:** Once inside the desired directory (`paralel/temp_cte/`, `secuencial/temp_var/`, etc.), submit the job to the queue using:
+    ```bash
+    qsub run.sh
+    ```
+    
+**Output:** When the simulation finishes, a `RESULTS/` folder will be generated in the directory where you submitted the script. Inside `RESULTS/`, you will find 6 directories corresponding to the simulated temperatures (`T_200`, `T_300`, `T_400`, `T_500`, `T_600`, `T_700`). Each of these subdirectories contains the following output data:
+* `dihedral_angles.txt`
+* `distances.txt`
+* `energy.txt`
+* `trayectory.txt`
+
+*(Note: If you ran the simulation in the `paralel/` directory, an additional file named `timing_data.txt` will be generated, containing the execution times).*
+
+---
+
+### 2. Generating General Plots
+
+To generate plots that compare physical magnitudes across all simulated temperatures:
+
+1.  **Move the results:** Copy the newly generated `RESULTS/` folder to the root directory of the project. You can do this from the directory where `run.sh` was executed:
+    ```bash
+    cp -r RESULTS/ ../../
+    ```
+2.  **Activate Python Environment:** The general plots are generated using Python scripts. You need to activate a Conda environment with the required libraries. *(Recommendation: If you don't have a Conda environment in your personal node, start an interactive session on `cerqt03` and run `conda activate cmm`)*.
+3.  **Execute the plotting command:** From the root directory of the project, run:
+    ```bash
+    make plot_general
+    ```
+
+**Output:** Inside the root `RESULTS/` folder, a new directory named `GENERAL_PLOTS/` will be created containing 3 graphs:
+* `1_Energy_vs_Temperature.png`
+* `2_Gyration_Radius_vs_Temperature.png`
+* `3_Heatmap_Dihedral_Angles_vs_Temperature.png`
+
+---
+
+### 3. Generating Local Plots
+
+To generate specific plots for a single simulation at a specific reference temperature:
+
+1.  Ensure the `RESULTS/` folder is located in the root directory of the project.
+2.  From the root directory, execute:
+    ```bash
+    make plot_local
+    ```
+
+**Output:** A new directory named `LOCAL_PLOTS/` will be generated inside the root `RESULTS/` folder. This directory contains 6 subdirectories (one for each temperature). Inside each subdirectory, you will find 3 graphs specific to that temperature:
+* `dih_dist.png`
+* `energy.png`
+* `distances.png`
+
+---
+
+### 4. Cleaning Up Results
+
+To remove the output data generated by the simulations and maintain a clean workspace:
+
+1.  From the root directory of the project, execute:
+    ```bash
+    make clean_results
+    ```
+    This command will search for and delete the `RESULTS/` folders located inside the `paralel/` and `secuencial/` subdirectories.
+2.  **Note:** If you copied the `RESULTS/` folder to the root directory of the project (as instructed in Steps 2 and 3), the `make` command will not delete it automatically to prevent accidental data loss. To remove the root results folder, you must do it manually:
+    ```bash
+    rm -r RESULTS/
+    ```

@@ -10,8 +10,8 @@ program main
     integer :: accepted_moves, accepted_moves_b, rejected_moves, j, step
     real(8) :: coord(3, n_atoms), phi_rot
     real(8) :: E_LJ, E_dih, energy, dihedral_lst(n_atoms-3)
-    real(8) :: tower(n_atoms-3), temp, alpha
-    integer :: seed
+    real(8) :: tower(n_atoms-3), alpha
+    integer :: seed, T_blocks
     real(8) :: temps(6)
     integer :: i
     character(len=50) :: dir_name, filename
@@ -19,7 +19,8 @@ program main
     
     ! Temperature array
     temps = (/200.0d0, 300.0d0, 400.0d0, 500.0d0, 600.0d0, 700.0d0/)
-    
+    T_blocks = 20 ! Number of blocks for temperature modification (annealing)
+
     !Initial seed
     seed = 123456789
     
@@ -71,7 +72,7 @@ program main
         write(3, *) energy, E_LJ, E_dih, temp
 
         !Alpha for temperature modification (starting from 2500K to target temperature)
-        alpha = (temp/2500.0d0)**(1.0d0/REAL(T_blocks))
+        alpha = (temp/2500.0d0)**(1.0d0/REAL(T_blocks, kind=8))
 
         !Control points of the simulation
         step_ini = nint(n_steps * 0.15) ! 15%
@@ -90,16 +91,13 @@ program main
             if (step > step_ini .and. step <= step_end) then
                 if (mod(step -step_ini, step_size) == 0) then
                     temp = temp * alpha
-                    if (mod(step, n_steps/10) == 0) then
-                        print *, 'Thread', tid, 'T=', temps(i), 'Modifying temperature. Current temperature: ', temp, ' K'
-                    end if
                 end if
             end if
             
             ! Perform a Monte Carlo step
             call MC_step(coord, phi_rot, tower, &
              accepted_moves, rejected_moves, energy, dihedral_lst, &
-             E_LJ, E_dih, temp)
+             E_LJ, E_dih)
 
             !Writing results to files every 10 steps
             if (mod(step, 10) == 0) then
@@ -109,9 +107,11 @@ program main
                 !We write angles and distances when equilibration is reached
                 if (step > n_steps/2) then
                     write(5, *) end_end_dist(coord), rad_gyr(coord)
-                    do j = 1, n_atoms-3
-                        write(4, *) dihedral_lst(j)
-                    end do
+                    if (mod(step, 100) == 0) then
+                        do j = 1, n_atoms-3
+                            write(4, *) dihedral_lst(j)
+                        end do
+                    end if
                 end if
             end if
 

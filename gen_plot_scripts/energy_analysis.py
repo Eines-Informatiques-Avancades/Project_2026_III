@@ -10,7 +10,7 @@ energy_fluctuations = []
 
 #Calculate mean and standard deviation of energy for each temperature
 for t in temps:
-    ruta = f"PARALEL_RESULTS/T_{t}/energy.txt" 
+    ruta = f"RESULTS/T_{t}/energy.txt" 
     if os.path.exists(ruta):
         data = np.loadtxt(ruta, usecols = 0)
 
@@ -30,7 +30,7 @@ plt.ylabel('Mean Total Energy in Equilibrium (kJ/mol)')
 
 #Saving the plot in the directory GENERAL_PLOTS
 working_dir = os.getcwd()
-output_dir = os.path.join(working_dir, "PARALEL_RESULTS", "GENERAL_PLOTS")
+output_dir = os.path.join(working_dir, "RESULTS", "GENERAL_PLOTS")
 os.makedirs(output_dir, exist_ok=True)  # Crea GENERAL_PLOTS si no existe
 output_path = os.path.join(
     output_dir, "1_Energy_vs_Temperature.png"

@@ -89,9 +89,11 @@ program main
                 !We write angles and distances when equilibration is reached
                 if (step > n_steps/2) then
                     write(5, *) end_end_dist(coord), rad_gyr(coord)
-                    do j = 1, n_atoms-3
-                        write(4, *) dihedral_lst(j)
-                    end do
+                    if (mod(step, 100) == 0) then
+                        do j = 1, n_atoms-3
+                            write(4, *) dihedral_lst(j)
+                        end do
+                    end if
                 end if
             end if
 

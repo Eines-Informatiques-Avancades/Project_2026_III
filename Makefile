@@ -96,9 +96,9 @@ run_sec_var: $(TARGET_SEC_VAR)
 plot_general:$(ALL_TXT)
 	mkdir -p RESULTS/GENERAL_PLOTS/ 
 	@echo "Generating general plots."
-	python3 energy_analysis.py
-	python3 gyr_rad_analysis.py
-	python3 heatmap_dihedral.py	
+	python3 gen_plot_scripts/energy_analysis.py
+	python3 gen_plot_scripts/gyr_rad_analysis.py
+	python3 gen_plot_scripts/heatmap_dihedral.py	
 	@echo "General plots generated."
 
 #Local plots for each temperature
@@ -114,16 +114,16 @@ plot_local: $(ALL_PNGS)
 RESULTS/LOCAL_PLOTS/T_%/dih_dist.png: RESULTS/T_%/dihedral_angles.txt
 	mkdir -p RESULTS/LOCAL_PLOTS/T_$*/
 	@echo "Generating dihedral angle distribution for T=$*..."
-	gnuplot -e "INFILE='RESULTS/T_$*/dihedral_angles.txt'; OUTFILE='$@'; TEMP='$*'" dihedral.gnu
+	/bin/gnuplot -e "INFILE='RESULTS/T_$*/dihedral_angles.txt'; OUTFILE='$@'; TEMP='$*'" local_plot_scripts/dihedral.gnu
 
 RESULTS/LOCAL_PLOTS/T_%/energy.png: RESULTS/T_%/energy.txt
 	@echo "Generating energy plot for T=$*..."
-	gnuplot -e "INFILE='RESULTS/T_$*/energy.txt'; OUTFILE='$@'; TEMP='$*'" energy.gnu
+	/bin/gnuplot -e "INFILE='RESULTS/T_$*/energy.txt'; OUTFILE='$@'; TEMP='$*'" local_plot_scripts/energy.gnu
 
 
 RESULTS/LOCAL_PLOTS/T_%/distances.png: RESULTS/T_%/distances.txt
 	@echo "Generating distance distribution for T=$*..."
-	gnuplot -e "INFILE='RESULTS/T_$*/distances.txt'; OUTFILE='$@'; TEMP='$*'" distances.gnu
+	/bin/gnuplot -e "INFILE='RESULTS/T_$*/distances.txt'; OUTFILE='$@'; TEMP='$*'" local_plot_scripts/distances.gnu
 
 
 
